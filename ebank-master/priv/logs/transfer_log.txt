@@ -1,0 +1,8 @@
+127.0.0.1 - - [15/Mar/2016:14:50:06 -0700] "GET /ebank/web:do/page/login HTTP/1.1" 200 891
+127.0.0.1 - - [15/Mar/2016:14:50:07 -0700] "GET /ebank/web:do/post/login?user=Henry+Nystrom&pin=1234 HTTP/1.1" 200 0
+127.0.0.1 - - [15/Mar/2016:14:50:07 -0700] "GET /ebank/web:do/page/settings HTTP/1.1" 200 1507
+127.0.0.1 - - [15/Mar/2016:14:50:09 -0700] "GET /ebank/web:do/page/transactions HTTP/1.1" 200 1474
+127.0.0.1 - - [15/Mar/2016:14:50:15 -0700] "GET /ebank/web:do/page/accounts HTTP/1.1" 200 1964
+127.0.0.1 - - [15/Mar/2016:14:50:27 -0700] "GET /ebank/web:do/post/transfer?amount=500&from=4&to=1 HTTP/1.1" 200 0
+127.0.0.1 - - [15/Mar/2016:14:50:27 -0700] "GET /ebank/web:do/page/accounts HTTP/1.1" 200 1964
+127.0.0.1 - - [15/Mar/2016:14:50:28 -0700] "GET /ebank/web:do/page/transactions HTTP/1.1" 200 1730
