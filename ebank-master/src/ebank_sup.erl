@@ -1,80 +1,27 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% File     : ebank_sup.erl
-%%% Author   : <trainers@erlang-solutions.com>
-%%% Copyright: 1999-2011 Erlang Solutions Ltd.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MODULE INFO
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 -module(ebank_sup).
 -vsn('1.0').
 -behaviour(supervisor).
+-export([start_link/0, start_atm/2, stop_atm/1]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% INCLUDES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% EXPORTS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%
-% Interface
-%
--export([start_link/0, stop/0]).
-
-%%%%%
-% Gen supervisor part
-%
 -export([init/1]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DEFINES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% RECORDS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% EXPORTED FUNCTIONS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%
-%% @spec () -> 
-%
 start_link() -> supervisor:start_link({local, ?MODULE}, ?MODULE, no_args).
 
-%%%%%
-%% @spec () -> 
-%
-stop() -> exit(whereis(?MODULE), shutdown).
-  
+start_atm(Name, Port) -> supervisor:start_child(?MODULE, child(atm_sup, Name, [Port])).
+
+stop_atm(Name) ->
+ io:format("*******************ebank_sup stop_atm~n"), 
+ supervisor:terminate_child(?MODULE, {atm_sup, Name}),
+ supervisor:delete_child(?MODULE, {atm_sup, Name}).
   
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% EXPORTED FUNCTIONS/SUPERVISOR CALLBACKS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%
-%% @spec () -> 
-%
 init(no_args) ->
-  {ok, {{rest_for_one, 5, 2000},
-    [child(backend, none), child(atm, atm1), child(webatm, atm1, [8081])]}}.
+  {ok, {{rest_for_one, 5, 2000}, [child(backend, none)]}}.
   
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% INTERNAL FUNCTIONS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%
-%% @spec () -> 
-%
 child(Module, none) ->
-    {Module, {Module, start_link, []}, permanent, brutal_kill, worker, [Module]};
+  {Module, {Module, start_link, []}, permanent, brutal_kill, worker, [Module]};
 child(Module, Name) ->
-    {Module, {Module, start_link, [Name]}, permanent, brutal_kill, worker, [Module]}.
+  {{Module, Name}, {Module, start_link, [Name]}, permanent, brutal_kill, worker, [Module]}.
 child(Module, Name, Args) ->
-    {Module, {Module, start_link, [Name] ++ Args}, permanent, brutal_kill, worker, [Module]}.
+  {{Module, Name}, {Module, start_link, [Name] ++ Args}, permanent, brutal_kill, worker, [Module]}.

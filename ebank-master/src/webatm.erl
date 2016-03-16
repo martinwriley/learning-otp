@@ -69,6 +69,7 @@ start_link(Name, Port) ->
     {ok, Pid}.
 
 stop(Name) ->
+  io:format("*******************webatm stop~n"), 
     Pid = lookup_pid(Name),
     delete_name(Name),
     inets:stop(httpd, Pid).

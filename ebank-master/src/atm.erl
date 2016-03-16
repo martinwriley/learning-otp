@@ -22,7 +22,9 @@ start(Name) -> gen_fsm:start({global, {?MODULE, Name}}, ?MODULE, Name, []).
 start_link(Name) ->
   gen_fsm:start_link({global, {?MODULE, Name}}, ?MODULE, Name, []).
 
-stop(Name) -> gen_fsm:send_event({global, {?MODULE, Name}}, stop).
+stop(Name) -> 
+  io:format("*******************atm stop~n"), 
+  gen_fsm:send_event({global, {?MODULE, Name}}, stop).
 
 event(Name, E) -> gen_fsm:send_event({global, {?MODULE, Name}}, E).
 
@@ -151,7 +153,9 @@ handle_info(Info, _, State) ->
 
 code_change(_, StateName, State, _) -> {ok, StateName, State}.
 
-terminate(_, _, _) -> ok.
+terminate(_, _, _) -> 
+  io:format("*******************atm terminate~n"), 
+  ok.
 
 clear(StateName, State) ->
   webatm:do(State#state.name, [webatm:display(" ")]),
